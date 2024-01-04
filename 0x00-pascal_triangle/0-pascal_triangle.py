@@ -1,16 +1,23 @@
 #!/usr/bin/python3
 
 def pascal_triangle(n):
-    # Returns a list representing pascal's triangle of n
     if n <= 0:
         return []
-    if n <= 8:
-        return [ [1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1],[1,5,10,10,5,1],[1,6,15,20,15,6,1],[1,7,21,35,35,21,7,1] ]
-    else:
-        triangle = [[1]]
-        for i in range(1, n):
-            triangle.append([1])
-            for j in range(1, i):
-                triangle[i].append(triangle[i-1][j-1] + triangle[i-1][j])
-            triangle[i].append(1)
-        return triangle
+
+    triangle = [[1]]
+    for i in range(1, n):
+        prev_row = triangle[-1]
+        new_row = [1]
+        for j in range(1, i):
+            new_row.append(prev_row[j - 1] + prev_row[j])
+        new_row.append(1)
+        triangle.append(new_row)
+
+    return triangle
+
+def print_triangle(triangle):
+    for row in triangle:
+        print("[{}]".format(",".join([str(x) for x in row])))
+
+if __name__ == "__main__":
+    print_triangle(pascal_triangle(5))
