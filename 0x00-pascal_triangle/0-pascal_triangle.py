@@ -1,23 +1,41 @@
 #!/usr/bin/python3
+'''
+Module 0-pascal_triangle
+Contains function pascal_triangle(n)
+'''
+
 
 def pascal_triangle(n):
+    '''
+    Pascal's triangle solver
+    Args:
+      n (int): The number of rows of the triangle
+    Returns:
+      List of list of numbers, each list representing a
+    '''
     if n <= 0:
         return []
+    my_list, temp, r = [], [], 0
+    for i in range(n):
+        while r <= i:
+            temp.append(int(combination(i, r)))
+            r += 1
+        my_list.append(temp)
+        temp = []
+        r = 0
+    return my_list
 
-    triangle = [[1]]
-    for i in range(1, n):
-        prev_row = triangle[-1]
-        new_row = [1]
-        for j in range(1, i):
-            new_row.append(prev_row[j - 1] + prev_row[j])
-        new_row.append(1)
-        triangle.append(new_row)
 
-    return triangle
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
 
-def print_triangle(triangle):
-    for row in triangle:
-        print("[{}]".format(",".join([str(x) for x in row])))
 
-if __name__ == "__main__":
-    print_triangle(pascal_triangle(5))
+def combination(n, r):
+    """
+    computes the combination of two numbers
+    """
+    num = factorial(n)
+    den = factorial(n - r) * factorial(r)
+    return num / den
