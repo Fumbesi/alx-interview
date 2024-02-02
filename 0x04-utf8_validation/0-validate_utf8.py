@@ -1,47 +1,54 @@
 #!/usr/bin/python3
 """
-Valid UTF-8 encoding checker
+utf-8 validation module
 """
 
-import sys
+
+def decimalToBinary(n):
+    '''Converts an integer decimal to its binary representation.'''
+    return bin(n).replace("0b", "")
+
 
 def validUTF8(data):
-    # Helper function to check if a given number has the correct format
-    def is_start_of_char(byte):
-        return bin(byte).startswith('0b' + '1' * (8 - len(bin(byte))))
+    '''Returns True if data is a valid UTF-8 encoding, else return False
+    data is a list of integers, each integer representing a byte'''
 
-    # Iterate through the data
     i = 0
     while i < len(data):
-        # Get the number of bytes in the current character
-        num_bytes = 0
-        while i < len(data) and is_start_of_char(data[i]):
-            num_bytes += 1
+        if len(decimalToBinary(data[i])) < 8:
             i += 1
-
-        # Check if the number of bytes is valid
-        if num_bytes == 0:
-            return False
-        elif num_bytes == 1:
             continue
-        elif num_bytes > 4:
-            return False
 
-        # Check if the following bytes are valid continuation bytes
-        for j in range(1, num_bytes):
-            if i + j >= len(data) or not bin(data[i + j]).startswith('0b10'):
+        elif decimalToBinary(data[i])[0:3] == '110' and i + 1 < len(data):
+            secondChar = decimalToBinary(data[i + 1])
+
+            if len(secondChar) < 8:
                 return False
+            elif secondChar[0:2] == '10':
+                i += 2
+                continue
 
-        i += num_bytes
+        elif decimalToBinary(data[i])[0:4] == '1110' and i + 2 < len(data):
+            secondChar = decimalToBinary(data[i + 1])
+            thirdChar = decimalToBinary(data[i + 2])
+            if len(secondChar) < 8 or len(thirdChar) < 8:
+                return False
+            elif secondChar[0:2] == '10' and thirdChar[0:2] == '10':
+                i += 3
+                continue
+
+        elif decimalToBinary(data[i])[0:5] == '11110' and i + 3 < len(data):
+            secondChar = decimalToBinary(data[i + 1])
+            thirdChar = decimalToBinary(data[i + 2])
+            fourthChar = decimalToBinary(data[i + 3])
+            if (len(secondChar) < 8 or len(thirdChar) < 8 or
+                    len(fourthChar) < 8):
+                return False
+            elif (secondChar[0:2] == '10' and thirdChar[0:2] == '10' and
+                  fourthChar[0:2] == '10'):
+                i += 4
+                continue
+        else:
+            return False
 
     return True
-
-if __name__ == '__main__':
-    try:
-        # Example usage:
-        data_set = [197, 130, 1]  # This is a valid UTF-8 encoding
-        result = validUTF8(data_set)
-        print(result)  # Output: True
-    except KeyboardInterrupt:
-        raise
-
